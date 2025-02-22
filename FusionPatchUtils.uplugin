@@ -1,0 +1,34 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0",
+	"FriendlyName": "FusionPatchUtils",
+	"Description": "Utils to create Fusion Patches from popular sampler formats, currently supports SFZ and Descent Sampler presets ",
+	"Category": "Other",
+	"CreatedBy": "Amir Ben-Kiki",
+	"CreatedByURL": "https://github.com/Amir-BK",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"CanContainContent": true,
+	"IsBetaVersion": false,
+	"IsExperimentalVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "FusionPatchUtils",
+			"Type": "Editor",
+			"LoadingPhase": "Default"
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "Metasound",
+			"Enabled": true
+		},
+		{
+			"Name": "Harmonix",
+			"Enabled": true
+		}
+	]
+}

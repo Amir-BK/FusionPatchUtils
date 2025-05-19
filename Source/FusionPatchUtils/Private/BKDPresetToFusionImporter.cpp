@@ -21,16 +21,15 @@ UObject* UBKDPresetToFusionImporter::FactoryCreateFile(UClass* InClass, UObject*
 	UE_LOG(LogTemp, Log, TEXT("Path String:  %s"), *PathString)
 		const FString& path = Filename;
 	FString UnrealSampleSavePath = TEXT("/Game/Imported/SFZSamples/");
-	FPaths::MakePlatformFilename(UnrealSampleSavePath);
+	//FPaths::MakePlatformFilename(UnrealSampleSavePath);
 
 	FXmlFile MyXMLfile = FXmlFile();
 
-	//FName newName = FName(InName.ToString().Append(TEXT("")));
 
 	UFusionPatch* NewFusionPatch = NewObject<UFusionPatch>(InParent, InClass, InName, Flags);
 
 	MyXMLfile.LoadFile(path);
-	//MyXMLfile.
+
 
 	traverseXML(MyXMLfile.GetRootNode(), KeyZoneArray, newSettings);
 
@@ -43,27 +42,34 @@ UObject* UBKDPresetToFusionImporter::FactoryCreateFile(UClass* InClass, UObject*
 
 	for (auto& keyzone : KeyZoneArray) {
 		ParseDSPresetRegionsTask.EnterProgressFrame();
-		FString sampleToImportPath = keyzone.SamplePath;
-		sampleToImportPath = FPaths::ConvertRelativePathToFull(FPaths::Combine(PathString + "/" + sampleToImportPath));
-		FPaths::MakeStandardFilename(sampleToImportPath);
-		FPaths::NormalizeFilename(sampleToImportPath);
+		FString SampleToImportPath = keyzone.SamplePath;
+		SampleToImportPath = FPaths::ConvertRelativePathToFull(FPaths::Combine(PathString + "/" + SampleToImportPath));
+		FPaths::MakeStandardFilename(SampleToImportPath);
+		FPaths::NormalizeFilename(SampleToImportPath);
 
-		FString ResultPath = FPaths::Combine(
-			UnrealSampleSavePath + FPaths::MakeValidFileName(keyzone.SamplePath));
-		if (FPaths::FileExists(sampleToImportPath))
+		//we need to ensure the keyzone.SamplePath is a valid Package Name
+		FString ValidSamplePath = FPaths::MakeValidFileName(keyzone.SamplePath);
+
+
+		AssetToolsModule.Get().SanitizeName(ValidSamplePath);
+		ValidSamplePath.ReplaceInline(TEXT("."), TEXT("_"));
+		UE_LOG(LogTemp, Log, TEXT("Sample to import path: %s"), *ValidSamplePath)
+
+		FString ResultPath = UnrealSampleSavePath + ValidSamplePath;
+		if (FPaths::FileExists(SampleToImportPath))
 		{
-			TArray<FString> fileToImport;
-			fileToImport.Add(sampleToImportPath);
+			TArray<FString> FilenamesArray;
+			FilenamesArray.Add(SampleToImportPath);
 
 			UAutomatedAssetImportData* newSample = NewObject<UAutomatedAssetImportData>();
 
 			newSample->DestinationPath = ResultPath;
-			newSample->Filenames = fileToImport;
+			newSample->Filenames = FilenamesArray;
 			newSample->bReplaceExisting = true;
 
 			FString Extension = FPaths::GetExtension(ResultPath);
 			GEditor->GetEditorSubsystem<UImportSubsystem>()->BroadcastAssetPreImport(
-				this, USoundWave::StaticClass(), this, FName(*fileToImport[0]), *Extension);
+				this, USoundWave::StaticClass(), this, FName(*FilenamesArray[0]), *Extension);
 
 			auto ResultArray = AssetToolsModule.Get().ImportAssetsAutomated(newSample);
 			if (!ResultArray.IsEmpty())
@@ -83,7 +89,7 @@ UObject* UBKDPresetToFusionImporter::FactoryCreateFile(UClass* InClass, UObject*
 		}
 		else
 		{
-			UE_LOG(LogTemp, Log, TEXT("No sample cause the path looks like this: %s"), *sampleToImportPath)
+			UE_LOG(LogTemp, Log, TEXT("No sample cause the path looks like this: %s"), *SampleToImportPath)
 				NumFilesFailedToImport++;
 		}
 	}

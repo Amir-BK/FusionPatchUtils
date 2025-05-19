@@ -4,7 +4,7 @@
 	"VersionName": "1.0",
 	"FriendlyName": "FusionPatchUtils",
 	"Description": "Utils to create Fusion Patches from popular sampler formats, currently supports SFZ and Descent Sampler presets ",
-	"Category": "Other",
+	"Category": "Audio",
 	"CreatedBy": "Amir Ben-Kiki",
 	"CreatedByURL": "https://github.com/Amir-BK",
 	"DocsURL": "",

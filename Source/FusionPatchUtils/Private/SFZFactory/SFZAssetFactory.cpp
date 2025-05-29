@@ -73,6 +73,8 @@ void USFZOpCodeLineParser::PopulateSFZRegion(USFZRegion* Region, UFKSFZAsset* Ne
 			break;
 		case SFZInteger:
 			if (KEY_IS("group")) { Region->group = FCString::Atoi(*TrimmedValue); break; }
+			//offset
+			if (KEY_IS("offset")) { Region->Offset = FCString::Atoi(*TrimmedValue); break; }
 			Region->SFZIntParamsArray.Add(key, FCString::Atoi(*TrimmedValue));
 			break;
 		case SFZFloat:
@@ -97,12 +99,14 @@ void USFZOpCodeLineParser::PopulateSFZRegion(USFZRegion* Region, UFKSFZAsset* Ne
 			if (KEY_IS("pitch_keycenter") || KEY_IS("key"))
 			{
 				Region->centerNoteValue = FMath::Clamp(USFZAssetFactory::ParseOpCodeValueToInt(TrimmedValue) + Factory->Octave_Offset * 12, 0, 127);
+
 			};
-			if (KEY_IS("lokey") || KEY_IS("key"))
+			if (KEY_IS("lokey") || (KEY_IS("key") && Region->loNote == -1))
 			{
 				Region->loNote = FMath::Clamp(USFZAssetFactory::ParseOpCodeValueToInt(TrimmedValue) + Factory->Octave_Offset * 12, 0, 127);
+
 			};
-			if (KEY_IS("hikey") || KEY_IS("key"))
+			if (KEY_IS("hikey") || (KEY_IS("key") && Region->hiNote == -1))
 			{
 				Region->hiNote = FMath::Clamp(USFZAssetFactory::ParseOpCodeValueToInt(TrimmedValue) + Factory->Octave_Offset * 12, 0, 127);
 			};
@@ -421,10 +425,7 @@ UObject* USFZAssetFactory::FactoryCreateFile(UClass* InClass, UObject* InParent,
 
 	for (auto& processedSFZRegion : NewAsset->Regions)
 	{
-		//processedSFZRegion->WavAsset->LoadingBehavior = ESoundWaveLoadingBehavior::RetainOnLoad;
 
-		//FKeyzoneArgs newZoneArgs = FKeyzoneArgs();
-		//newZoneArgs.MaxNote = processedSFZRegion->hiNote;
 		// we don't want keyzones without wavs...
 		if (!processedSFZRegion->WavAsset) continue;
 		FKeyzoneSettings newKeyzone = FKeyzoneSettings();
@@ -437,6 +438,7 @@ UObject* USFZAssetFactory::FactoryCreateFile(UClass* InClass, UObject* InParent,
 		newKeyzone.MinVelocity = processedSFZRegion->loVel;
 		newKeyzone.MaxVelocity = processedSFZRegion->hiVel;
 		newKeyzone.bUnpitched = SFZsettings.bUnpitched;
+		newKeyzone.SampleStartOffset = processedSFZRegion->Offset;
 		newKeyzone.bVelocityToGain = SFZsettings.velToGain;
 
 		newKeyzone.SampleStartOffset = processedSFZRegion->Offset;
@@ -462,6 +464,13 @@ UObject* USFZAssetFactory::FactoryCreateFile(UClass* InClass, UObject* InParent,
 		//newKeyzone.a
 
 		KeyZoneArray.Add(newKeyzone);
+	}
+
+	//for debugging, iterate through the keyzones and print their values
+	for (const auto& keyzone : KeyZoneArray)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Keyzone: RootNote: %d, MinNote: %d, MaxNote: %d, MinVel: %d, MaxVel: %d, Gain: %f, FineTuneCents: %f, SampleStartOffset: %d"),
+			keyzone.RootNote, keyzone.MinNote, keyzone.MaxNote, keyzone.MinVelocity, keyzone.MaxVelocity, keyzone.Gain, keyzone.FineTuneCents, keyzone.SampleStartOffset);
 	}
 
 	//Audio::FProxyDataInitParams InitParams;

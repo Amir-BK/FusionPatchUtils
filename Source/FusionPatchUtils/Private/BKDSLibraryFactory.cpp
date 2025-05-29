@@ -106,10 +106,6 @@ UObject* UBKDSLibraryFactory::FactoryCreateFile(UClass* InClass, UObject* InPare
 
 UBKDSLibraryFactory::UBKDSLibraryFactory()
 {
-	//Formats.Add(FString(TEXT("sfz;")) + NSLOCTEXT("USFZAssetFactory", "FormatSfz", "SFZ File").ToString());
-
-	//DISABLED UNTIL I SORT ZIP UNARCHIVING THE SAMPLES
-	//
 	//Formats.Add(TEXT("dslibrary;Decent Sampler Library Archive"));
 	SupportedClass = UFusionPatch::StaticClass();
 	bCreateNew = false;

@@ -70,6 +70,8 @@ struct FSFZRegionPerformanceParameters
 
 	UPROPERTY();
 	float Velocity;
+
+
 };
 
 // these are the region mapping parameters, used to check conditions and figure out if the region should play
@@ -105,6 +107,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true", EditInLine = "true"), Category = "BK Music|SFZ")
 	int group = -1;
 
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true", EditInLine = "true"), Category = "BK Music|SFZ")
 	int off_by = -1;
 
@@ -135,7 +138,7 @@ public:
 	float Loop_End_Time = -1;
 
 	UPROPERTY()
-	float Offset = 0;
+	float Offset = -1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true", EditInLine = "true"), Category = "BK Music|SFZ")
 	float Offset_Time = 0;

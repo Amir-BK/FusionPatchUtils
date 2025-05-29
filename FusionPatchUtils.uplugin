@@ -19,6 +19,11 @@
 			"Name": "FusionPatchUtils",
 			"Type": "Editor",
 			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "FusionPatchUtilsRuntime",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
 		}
 	],
 	"Plugins": [
